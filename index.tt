@@ -1,0 +1,303 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+ <title>XKPasswd - Secure Memorable Passwords</title>
+ <link rel="stylesheet" href="xkpasswd.css" type="text/css" media="all" />
+ <link rel="shortcut icon" href="favicon.png" type="image/png" />
+ <link rel="icon" href="favicon.png" type="image/png" />
+ <script type="text/javascript" src="contrib/jquery-2.1.1.min.js"></script>
+ <script type="text/javascript" src="index.js"></script>
+</head>
+<body>
+ <!-- page header-->
+ <div id="pageHeader">
+  <img alt="XKPasswd - A Secure Memorable Password Generator" src="sideBanner.png" width="150" height="750" />
+ </div>
+ 
+ <!-- page content -->
+ <div id="pageContent">
+  <p id="inspiredLinksContainer">Inspired by <a href="http://xkcd.com/936/" target="_blank">XKCD</a> and <a href="https://www.grc.com/haystack.htm" target="_blank">Password Hay Stacks</a> | Powered by <code><a href="http://bartb.ie/xkpasswd" target="_blank">XKPasswd.pm</a></code></p>
+  
+  <!-- Donate Box -->
+  <div id="donate_container" class="closeable">
+   This service is provided entirely for free and without ads, but
+   the server is not free to run. Please consider making a small contribution towards those costs.
+   <div id="donation_button">
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+     <input type="hidden" name="cmd" value="_s-xclick" />
+     <input type="hidden" name="hosted_button_id" value="HEYHNGKY8EASE" />
+     <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!" />
+     <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+    </form>
+   </div>
+  </div>
+  
+  <!-- Browser warnings (if any - browser_supported=[% browser_supported %]) -->
+  [% IF browser_supported == 'NO';
+       INCLUDE 'error-browser-unsupported.tt';
+     END;
+     IF browser_supported == 'MAYBE';
+       INCLUDE 'error-browser-maybe-unsupported.tt';
+     END;
+  %]
+  
+  <!-- password generator -->
+  <form>
+  <fieldset>
+   <legend>Password Generator</legend>
+   
+   <!-- Presets -->
+   <fieldset id="presets_interface">
+    <legend>Presets</legend>
+    
+    <p id="preset_buttons_container"><img src="contrib/ajax-loader.gif" alt="Loading ..." /></p>
+    <p id="preset_load_error_container" class="error">Preset loading errors will go here<span id="preset_load_error"></span></p>
+   </fieldset>
+   
+   <!-- password settings -->
+   <fieldset>
+    <legend>Settings</legend>
+    
+    <!-- wrap the form elements in a DIV so it can be enabled and disabled as appropriate -->
+    <div id="password_form_container">
+     <!-- overlay div for enabling/disabling use of the form -->
+     <div id="form_overlay"></div>
+    
+     <!-- word settings -->
+     <div id="section_words" class="section_container">
+      <div class="section_header"><span class="section_title">Words:</span></div>
+      <div class="section_body">
+       <label for="dict">Dictionary:</label>
+       <select id="dict">
+        <option value="english" selected="selected">English</option>
+       </select>
+       <label for="num_words">Number of Words:</label>
+       <select id="num_words">
+        <option value="2">2</option>
+        <option value="3" selected="selected">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+       </select>
+       <label for="word_length_min">Minimum Length:</label>
+       <select id="word_length_min">
+        <option value="4" selected="selected">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+       </select>
+       <label for="word_length_max">Maximum Length:</label>
+       <select id="word_length_max">
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8" selected="selected">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+       </select>
+      </div>
+     </div>
+     
+     <!-- Word Transformations -->
+     <div id="section_transformations" class="section_container">
+      <div class="section_header"><span class="section_title">Transformations:</span></div>
+      <div class="section_body">
+       <label for="case_transform">Case Transformation:</label>
+       <select id="case_transform">
+        <option value="NONE">-none-</option>
+        <option value="ALTERNATE" selected="selected">alternating WORD case</option>
+        <option value="CAPITALISE">Capitalise First Letter</option>
+        <option value="INVERT">cAPITALISE eVERY lETTER eXCEPT tHe fIRST</option>
+        <option value="LOWER">lower case</option>
+        <option value="UPPER">UPPER CASE</option>
+        <option value="RANDOM">EVERY word randomly CAPITALISED or NOT</option>
+       </select>
+      </div>
+     </div>
+     
+     <!-- Separator -->
+     <div id="section_separator" class="section_container">
+      <div class="section_header"><span class="section_title">Separator:</span></div>
+      <div class="section_body">
+       <label for="separator_type">Type:</label>
+       <select id="separator_type">
+        <option value="NONE" selected="selected">-none-</option>
+        <option value="CHAR">Specified Character</option>
+        <option value="RANDOM">Random Character</option>
+       </select>
+       <span id="separator_type_char" style="display:none"><label for="separator_type_char_tb">Character:</label>
+        <input type="text" size="1" maxlength="1" id="separator_type_char_tb" value="-" />
+        <span id="separator_type_char_tb_err" class="validation_error">must enter exactly 1 character</span>
+       </span>
+       <span id="separator_type_random" style="display:none"><label>Separator Alphabet:</label>
+        <span id="separator_type_random_tbset" class="tbset"><input type="text" size="1" maxlength="1" id="separator_type_random_1" value="-" /><input type="text" size="1" maxlength="1" id="separator_type_random_2" value="+" /><input type="text" size="1" maxlength="1" id="separator_type_random_3" value="=" /><input type="text" size="1" maxlength="1" id="separator_type_random_4" value="*" /><input type="text" size="1" maxlength="1" id="separator_type_random_5" value="," /><input type="text" size="1" maxlength="1" id="separator_type_random_6" value="_" /></span>
+        <span id="separator_type_random_err" class="validation_error">must enter at least 2 characters</span>
+       </span>
+      </div>
+     </div>
+     
+     <!-- Digit Padding -->
+     <div id="section_padding_digits" class="section_container">
+      <div class="section_header"><span class="section_title">Padding Digits:</span></div>
+      <div class="section_body">
+       <label for="padding_digits_before">Digit(s) Before:</label>
+       <select id="padding_digits_before">
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2" selected="selected">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+       </select>
+       <label for="padding_digits_after">Digit(s) After:</label>
+       <select id="padding_digits_after">
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2" selected="selected">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+       </select>
+      </div>
+     </div>
+     
+     <!-- Symbol Padding -->
+     <div id="section_padding_symbols" class="section_container">
+      <div class="section_header"><span class="section_title">Padding Symbols:</span></div>
+      <div class="section_body">
+       <label for="padding_type">Padding Type:</label>
+       <select id="padding_type">
+        <option value="NONE" selected="selected">-none-</option>
+        <option value="FIXED">Fixed</option>
+        <option value="ADAPTIVE">Adaptive</option>
+       </select>
+       <span id="padding_type_fixed" style="display:none">
+        <label for="padding_characters_before">Symbol(s) Before:</label>
+        <select id="padding_characters_before">
+         <option value="0">0</option>
+         <option value="1">1</option>
+         <option value="2" selected="selected">2</option>
+         <option value="3">3</option>
+         <option value="4">4</option>
+         <option value="5">5</option>
+        </select>
+        <label for="padding_characters_after">Symbol(s) After:</label>
+        <select id="padding_characters_after">
+         <option value="0">0</option>
+         <option value="1">1</option>
+         <option value="2" selected="selected">2</option>
+         <option value="3">3</option>
+         <option value="4">4</option>
+         <option value="5">5</option>
+        </select>
+       </span>
+       <span id="padding_type_adaptive" style="display:none">
+        <label for="pad_to_length">Pad to Length:</label>
+        <input type="number" size="3" id="pad_to_length" value="32" min="8" max="999" /> <span id="pad_to_length_err" class="validation_error">must be an integer between 8 and 999</span>
+       </span>
+       <div id="padding_char_container" style="display:none">
+        <label for="padding_char_type">Padding Character:</label>
+        <select id="padding_char_type">
+         <option value="SEPARATOR" id="padding_char_type_separator" disabled="disabled">Use Separator Character</option>
+         <option value="CHAR" selected="selected">Specified Character</option>
+         <option value="RANDOM">Random Character</option>
+        </select>
+        <span id="padding_char_type_char"><label for="padding_character">Padding Character:</label>
+         <input type="text" size="1" maxlength="1" value="*" id="padding_character" />
+         <span id="padding_character_err" class="validation_error">must enter exactly 1 character</span>
+        </span>
+        <span id="padding_char_type_random" style="display:none"><label>Padding Character Alphabet:</label>
+         <span id="padding_char_type_random_tbset" class="tbset"><input type="text" size="1" maxlength="1" id="padding_char_type_random_1" value="!" /><input type="text" size="1" maxlength="1" id="padding_char_type_random_2" value="*" /><input type="text" size="1" maxlength="1" id="padding_char_type_random_3" value="=" /><input type="text" size="1" maxlength="1" id="padding_char_type_random_4" value="+" /><input type="text" size="1" maxlength="1" id="padding_char_type_random_5" value="-" /></span>
+         <span id="padding_char_type_random_err" class="validation_error">must enter at least 2 characters</span>
+        </span>
+       </div>
+      </div>
+     </div>
+    </div>
+    
+    <!-- Load/Save -->
+    <div id="section_load_save" class="section_container no_validate no_description">
+     <div class="section_header"><span class="section_title">Load/Save Config</span></div>
+     <div class="section_body">
+      <p><input type="button" id="save_config_btn" value="Save Config" /> <input type="button" id="load_config_btn" value="Load Config" /></p>
+      <p><textarea id="config_scratchspace" cols="32" rows="8"></textarea></p>
+      <p id="load_save_error_container" class="error"><span id="load_save_error">Error messages will go here</span></p>
+     </div>
+    </div>
+   </fieldset>
+   
+   <fieldset>
+    <legend id="summary_title">Summary</legend>
+    
+    <p><h3>Structure:</h3> <span id="password_structure_container" class="summary_data_container"></span></p>
+    <p class="aside summary_extra_info">(Legend: <span class="losenge structure_element">word</span> = A word, <span class="losenge structure_element">s</span> = the separator character, <span class="losenge structure_element">d</span> = a random digit, <span class="losenge structure_element">p</span> = the padding symbol)</p>
+    <p><h3>Length:</h3> <span id="length_container" class="summary_data_container"></span>
+     <span class="spacer">&nbsp;</span>
+     <h3>Character Coverage:</h3> <span id="coverage_container" class="summary_data_container"></span>
+     <span class="aside summary_extra_info">(Legend: <span class="losenge n">No</span><span class="losenge m">Maybe</span><span class="losenge y">Yes</span>)</span>
+    </p>
+   </fieldset>
+   
+   <fieldset>
+    <legend>Generate Password(s)</legend>
+    
+    <p><input type="button" id="generate_password_btn" class="submit_btn" value="Generate 3 Passwords" />
+     <label for="num_passwords">Num. Passwords: </label>
+     <select id="num_passwords">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3" selected="selected">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+      <option value="10">10</option>
+     </select>
+     <span class="spacer">&nbsp;</span>
+     <span id="password_trafficlight_container"></span>
+    </p>
+    <p><textarea id="generated_password" cols="64" rows="3"></textarea></p>
+    <p id="password_stats_container"></p>
+    <p class="error" id="generate_password_error_container"><span id="generate_password_errors"></span></p>
+   </fieldset>
+  </fieldset>
+  </form>
+  
+  <!-- Webpage text -->
+  
+  <h2>The <code>xkpasswd.pm</code> Perl Module</h2>
+  <p>This site is powered by the <code>XKPasswd.pm</code> Perl Module, and serves as a good example of its capabilities. The module has been released under the
+  FreeBSD license, so it's completely free to use, even within commercial products, providing the two terms of the FreeBSD license are observed. Bascially,
+  you can re-use the library as long as credit is given, the author's copyright notices are preserved, and you promise not to take legal action against the
+  author if the code gives you problems.</p>
+ 
+  <p>The module can be downloaded from the author's website: <a href="http://bartb.ie/xkpasswd" target="_blank">www.bartb.ie/xkpasswd</a>.</p>
+  
+  <h2>The Comic that Inspired This Tool</h2>
+  <p><a href="http://xkcd.com/936/" target="_blank"><img alt="XKCD - Password Strength" src="contrib/password_strength.png" /></a></p>
+  
+  <h2>Credits</h2>
+  <ul>
+   <li>Website and underlying password generation library (<code>XKPasswd.pm</code>) by <a href="http://www.bartb.ie/" target="_blank">Bart Busschots</a>.</li>
+   <li>Banner by Stu Helm (incorporating artwork from the <a href="http://xkcd.com/" taret="_blank">XKCD Web Comic</a>).</li>
+   <li>Icons from <a href="http://www.famfamfam.com/lab/icons/silk/" target="_blank">Silk Icons by FAMFAMFAM</a>, <a href="http://p.yusukekamiyamane.com" target="_blank">Fugue Icons</a> and <a href="http://www.ajaxload.info/" target="_blank">www.ajaxload.info</a>.</li>
+   <li>Web Interface powered by <a href="http://jquery.com" target="_blank">JQuery</a>.</li>
+  </ul>
+ </div>
+</body>
+</html>
