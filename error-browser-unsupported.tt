@@ -1,6 +1,0 @@
-<div id="browser_error">Your browser ([% browser_name %] [% browser_version %])
-is not compatible with the
-<a href="http://jquery.com" target="_blank">JQuery 2</a> library that powers
-this site. Out of date browsers are a real security risk, so
-<a href="http://browsehappy.com" target="_blank">please consider upgrading to a
-modern browser</a>.</div>
