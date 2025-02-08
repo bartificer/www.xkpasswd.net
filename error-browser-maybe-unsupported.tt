@@ -1,6 +1,0 @@
-<div id="browser_warning" class="closeable">Your browser ([% browser_name %] [% browser_version %])
-doesn't apepar to be officially supported by the
-<a href="http://jquery.com" target="_blank">JQuery 2</a> library that powers
-this site. It may work just fine, but if not, perhaps
-<a href="http://browsehappy.com" target="_blank">consider updating</a> to one
-of the 'standard' modern browsers.</div>
