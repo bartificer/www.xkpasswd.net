@@ -56,6 +56,7 @@ class ConfigController {
 
   /**
    * The default class constructor
+   * @constructor
    *
    * @param {XKPasswd} model - reference to PasswordModel
    * @param {ConfigView} view - reference to ConfigView
