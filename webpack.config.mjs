@@ -20,6 +20,11 @@ export default {
   devServer: {
     static: './dist',
   },
+  resolve: {
+    alias: {
+      '@lib': path.resolve(__dirname, 'src/lib'),
+    },
+  },
   plugins: [
     new HtmlWebpackPlugin({
       title: 'Development',
