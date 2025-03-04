@@ -153,3 +153,5 @@ archive
 .idea
 test/allison-myxkpasswd.json
 test/allison-myxkpasswd.pl
+src/lib
+xkpasswd.code-workspace
