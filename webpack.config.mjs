@@ -23,7 +23,7 @@ export default {
   },
   resolve: {
     alias: {
-      '@lib': path.resolve(__dirname, 'src/lib'),
+      '@lib': path.resolve(__dirname, 'modules/lib/src'),
     },
   },
   plugins: [
